@@ -41,9 +41,9 @@ function Home() {
 
   const claimNFTs = () => {
     let cost = 0;
-    if (state == 1) {
+    if (state == 2) {
       cost = CONFIG.WEI_COST_OG;
-    } else if (state == 2) {
+    } else if (state == 1) {
       cost = CONFIG.WEI_COST_WL;
     } else {
       cost = CONFIG.WEI_COST_PU;
@@ -107,14 +107,14 @@ function Home() {
   const incrementMintAmount = () => {
     let newMintAmount = mintAmount + 1;
 
-    if (state == 1) {
+    if (state == 2) {
       newMintAmount > CONFIG.MAX_LIMIT_OG
         ? (newMintAmount = CONFIG.MAX_LIMIT_OG)
         : newMintAmount;
       setDisplayCost(
         parseFloat(CONFIG.DISPLAY_COST_OG * newMintAmount).toFixed(3)
       );
-    } else if (state == 2) {
+    } else if (state == 1) {
       newMintAmount > CONFIG.MAX_LIMIT_WL
         ? (newMintAmount = CONFIG.MAX_LIMIT_WL)
         : newMintAmount;
@@ -122,6 +122,9 @@ function Home() {
         parseFloat(CONFIG.DISPLAY_COST_WL * newMintAmount).toFixed(3)
       );
     } else {
+      newMintAmount > 2 
+      ? (newMintAmount = 2)
+      : newMintAmount;  
       setDisplayCost(
         parseFloat(CONFIG.DISPLAY_COST_PU * newMintAmount).toFixed(3)
       );
@@ -130,19 +133,19 @@ function Home() {
   };
 
   const maxNfts = () => {
-    if (state == 1) {
+    if (state == 2) {
       setMintAmount(CONFIG.MAX_LIMIT_OG);
       setDisplayCost(
         parseFloat(CONFIG.DISPLAY_COST_OG * CONFIG.MAX_LIMIT_OG).toFixed(3)
       );
-    } else if (state == 2) {
+    } else if (state == 1) {
       setMintAmount(CONFIG.MAX_LIMIT_WL);
       setDisplayCost(
         parseFloat(CONFIG.DISPLAY_COST_WL * CONFIG.MAX_LIMIT_WL).toFixed(3)
       );
     } else {
-      setMintAmount(10);
-      setDisplayCost(parseFloat(CONFIG.DISPLAY_COST_PU * 10).toFixed(3));
+      setMintAmount(2);
+      setDisplayCost(parseFloat(CONFIG.DISPLAY_COST_PU * 2).toFixed(3));
     }
   };
 
@@ -157,8 +160,9 @@ function Home() {
         .currentState()
         .call();
       setState(currentState);
+      console.log({currentState});
 
-      if (currentState == 1) {
+      if (currentState == 2) {
         setDisplayCost(CONFIG.DISPLAY_COST_OG);
         let mintOG = await blockchain.smartContract.methods
           .isOGed(blockchain.account)
@@ -166,14 +170,13 @@ function Home() {
         setCanMintOG(mintOG);
         mintOG ? "" : setFeedback(`You are not OGed Member!!!`);
         mintOG ? setDisable(false) : setDisable(true);
-      } else if (currentState == 2) {
+      } else if (currentState == 1) {
         let mintWL = await blockchain.smartContract.methods
           .isWhitelisted(blockchain.account)
           .call();
         setCanMintWL(mintWL);
         mintWL ? "" : setFeedback(`You are not WhiteListed Member!!!`);
         mintWL ? setDisable(false) : setDisable(true);
-
         setDisplayCost(CONFIG.DISPLAY_COST_WL);
       } else {
         setDisplayCost(CONFIG.DISPLAY_COST_PU);
@@ -202,7 +205,6 @@ function Home() {
 
   return (
     <>
-     
         <s.Image src={"config/images/clouds_blue.svg"} style={{
           transform: "rotate(180deg)"
         }}/>
@@ -222,7 +224,7 @@ function Home() {
             </s.TextTitle>
             <s.SpacerSmall />
             <s.TextSubTitle size={1.4}>
-              {888 - supply} of 888 NFT's Available
+              {CONFIG.MAX_SUPPLY - supply} of {CONFIG.MAX_SUPPLY} NFT's Available
             </s.TextSubTitle>
             <s.SpacerLarge />
             <s.SpacerLarge />
