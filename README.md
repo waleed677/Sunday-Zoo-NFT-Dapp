@@ -1,13 +1,12 @@
-# Metaverse Secret NFT's Mint Page
+# Sunday Zoo NFT's Mint Page
 
-![](https://raw.githubusercontent.com/waleed677/Joking-Jungle-Cats-Mint-Page/master/public/config/images/banner.jpeg)
 
 ## Website Link
 
-https://mint.metaversessecret.com/
+
 
 # From Fleek Access
-https://delicate-silence-7993.on.fleek.co/
+
 
 
 ## Installation
