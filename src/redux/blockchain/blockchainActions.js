@@ -145,6 +145,7 @@ export const connectWallet = () => {
         method: "net_version",
       });
       if (networkId == CONFIG.NETWORK_ID_WALLET || networkId == CONFIG.NETWORK.ID) {
+
         const SmartContractObj = new Web3EthContract(
           abi,
           CONFIG.CONTRACT_ADDRESS
@@ -165,6 +166,7 @@ export const connectWallet = () => {
         });
         // Add listeners end
       } else {
+        console.log("Wrong network");
         dispatch(connectFailed(`Change network to ${CONFIG.NETWORK.NAME}.`));
       }
     } catch (err) {
