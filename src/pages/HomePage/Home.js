@@ -8,9 +8,8 @@ import * as s from "./../../styles/globalStyles";
 const { createAlchemyWeb3, ethers } = require("@alch/alchemy-web3");
 var Web3 = require('web3');
 var Contract = require('web3-eth-contract');
-
 function Home() {
-  let cost = 0;
+
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
@@ -19,8 +18,9 @@ function Home() {
   const [supply, setTotalSupply] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [mintAmount, setMintAmount] = useState(1);
-  const [displayCost, setDisplayCost] = useState(cost);
+  const [displayCost, setDisplayCost] = useState(0);
   const [state, setState] = useState(-1);
+  const [nftCost, setNftCost] = useState(-1);
   const [canMintWL, setCanMintWL] = useState(false);
   const [canMintOG, setCanMintOG] = useState(false);
   const [disable, setDisable] = useState(false);
@@ -45,14 +45,8 @@ function Home() {
   });
 
   const claimNFTs = () => {
-    let cost = 0;
-    if (state == 2) {
-      cost = CONFIG.WEI_COST_OG;
-    } else if (state == 1) {
-      cost = CONFIG.WEI_COST_WL;
-    } else {
-      cost = CONFIG.WEI_COST_PU;
-    }
+    let cost = nftCost;
+    cost = Web3.utils.toWei(String(cost), "ether");
 
     let gasLimit = CONFIG.GAS_LIMIT;
     let totalCostWei = String(cost * mintAmount);
@@ -88,70 +82,36 @@ function Home() {
       });
   };
 
+
   const decrementMintAmount = () => {
     let newMintAmount = mintAmount - 1;
     if (newMintAmount < 1) {
       newMintAmount = 1;
     }
     setMintAmount(newMintAmount);
-    if (state == 1) {
-      setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_OG * newMintAmount).toFixed(3)
-      );
-    } else if (state == 2) {
-      setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_WL * newMintAmount).toFixed(3)
-      );
-    } else {
-      setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_PU * newMintAmount).toFixed(3)
-      );
-    }
+    setDisplayCost(
+      parseFloat(nftCost * newMintAmount).toFixed(2)
+    );
   };
 
   const incrementMintAmount = () => {
     let newMintAmount = mintAmount + 1;
-
-    if (state == 2) {
-      newMintAmount > CONFIG.MAX_LIMIT_OG
-        ? (newMintAmount = CONFIG.MAX_LIMIT_OG)
-        : newMintAmount;
-      setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_OG * newMintAmount).toFixed(3)
-      );
-    } else if (state == 1) {
-      newMintAmount > CONFIG.MAX_LIMIT_WL
-        ? (newMintAmount = CONFIG.MAX_LIMIT_WL)
-        : newMintAmount;
-      setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_WL * newMintAmount).toFixed(3)
-      );
-    } else {
-      newMintAmount > 2
-        ? (newMintAmount = 2)
-        : newMintAmount;
-      setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_PU * newMintAmount).toFixed(3)
-      );
-    }
+    newMintAmount > max
+      ? (newMintAmount = max)
+      : newMintAmount;
+    setDisplayCost(
+      parseFloat(nftCost * newMintAmount).toFixed(2)
+    );
     setMintAmount(newMintAmount);
   };
 
   const maxNfts = () => {
-    if (state == 2) {
-      setMintAmount(max);
-      setDisplayCost(
-        parseFloat(displayCost * max).toFixed(3)
-      );
-    } else if (state == 1) {
-      setMintAmount(CONFIG.MAX_LIMIT_WL);
-      setDisplayCost(
-        parseFloat(displayCost * max).toFixed(3)
-      );
-    } else {
-      setMintAmount(2);
-      parseFloat(displayCost * max).toFixed(3)
-    }
+    setMintAmount(max);
+
+    setDisplayCost(
+      parseFloat(nftCost * max).toFixed(2)
+    );
+   
   };
 
   const getData = async () => {
@@ -167,7 +127,6 @@ function Home() {
       setState(currentState);
 
       if (currentState == 2) {
-        setDisplayCost(CONFIG.DISPLAY_COST_OG);
         let mintOG = await blockchain.smartContract.methods
           .isOGed(blockchain.account)
           .call();
@@ -181,9 +140,8 @@ function Home() {
         setCanMintWL(mintWL);
         mintWL ? "" : setFeedback(`You are not WhiteListed Member!!!`);
         mintWL ? setDisable(false) : setDisable(true);
-        setDisplayCost(CONFIG.DISPLAY_COST_WL);
       } else {
-        setDisplayCost(CONFIG.DISPLAY_COST_PU);
+        
       }
     }
   };
@@ -222,9 +180,11 @@ function Home() {
     }
     else if (currentState == 1) {
       let wlCost = await contract.methods
-        .constWL()
+        .costWL()
         .call();
       setDisplayCost(web3.utils.fromWei(wlCost));
+      setNftCost(web3.utils.fromWei(wlCost));
+      setFeedback("Are you WhiteListed Member?");
 
       let wlMax = await contract.methods
         .maxMintAmountWL()
@@ -233,10 +193,10 @@ function Home() {
     }
     else if (currentState == 2) {
       let ogCost = await contract.methods
-        .constOG()
+        .costOG()
         .call();
       setDisplayCost(web3.utils.fromWei(ogCost));
-
+      setNftCost(web3.utils.fromWei(ogCost));
       let ogMax = await contract.methods
         .maxMintAmountOG()
         .call();
@@ -247,6 +207,7 @@ function Home() {
         .cost()
         .call();
       setDisplayCost(web3.utils.fromWei(puCost));
+      setNftCost(web3.utils.fromWei(puCost));
 
       let puMax = await contract.methods
         .maxMintAmountPublic()
