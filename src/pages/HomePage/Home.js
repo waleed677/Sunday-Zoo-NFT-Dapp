@@ -155,7 +155,7 @@ function Home() {
       },
     });
     const abi = await abiResponse.json();
-    var contract = new Contract(abi, '0xBD511eb72780FbcD03417980f7979b1AaA206f97');
+    var contract = new Contract(abi, '0x823995442988872cb1aa7c142c2f6ebda0bfeecf');
     contract.setProvider(web3.currentProvider);
     console.log(contract);
     // Get Total Supply
@@ -184,6 +184,7 @@ function Home() {
         .call();
       setDisplayCost(web3.utils.fromWei(wlCost));
       setNftCost(web3.utils.fromWei(wlCost));
+      console.log(wlCost);
       setFeedback("Are you WhiteListed Member?");
 
       let wlMax = await contract.methods
