@@ -5,6 +5,10 @@ import { fetchData } from "./../../redux/data/dataActions";
 import { StyledRoundButton } from "./../../components/styles/styledRoundButton.styled";
 import * as s from "./../../styles/globalStyles";
 
+const { createAlchemyWeb3, ethers } = require("@alch/alchemy-web3");
+var Web3 = require('web3');
+var Contract = require('web3-eth-contract');
+
 function Home() {
   let cost = 0;
   const dispatch = useDispatch();
@@ -20,6 +24,7 @@ function Home() {
   const [canMintWL, setCanMintWL] = useState(false);
   const [canMintOG, setCanMintOG] = useState(false);
   const [disable, setDisable] = useState(false);
+  const [max, setMax] = useState(0);
   const [CONFIG, SET_CONFIG] = useState({
     CONTRACT_ADDRESS: "",
     SCAN_LINK: "",
@@ -122,9 +127,9 @@ function Home() {
         parseFloat(CONFIG.DISPLAY_COST_WL * newMintAmount).toFixed(3)
       );
     } else {
-      newMintAmount > 2 
-      ? (newMintAmount = 2)
-      : newMintAmount;  
+      newMintAmount > 2
+        ? (newMintAmount = 2)
+        : newMintAmount;
       setDisplayCost(
         parseFloat(CONFIG.DISPLAY_COST_PU * newMintAmount).toFixed(3)
       );
@@ -134,18 +139,18 @@ function Home() {
 
   const maxNfts = () => {
     if (state == 2) {
-      setMintAmount(CONFIG.MAX_LIMIT_OG);
+      setMintAmount(max);
       setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_OG * CONFIG.MAX_LIMIT_OG).toFixed(3)
+        parseFloat(displayCost * max).toFixed(3)
       );
     } else if (state == 1) {
       setMintAmount(CONFIG.MAX_LIMIT_WL);
       setDisplayCost(
-        parseFloat(CONFIG.DISPLAY_COST_WL * CONFIG.MAX_LIMIT_WL).toFixed(3)
+        parseFloat(displayCost * max).toFixed(3)
       );
     } else {
       setMintAmount(2);
-      setDisplayCost(parseFloat(CONFIG.DISPLAY_COST_PU * 2).toFixed(3));
+      parseFloat(displayCost * max).toFixed(3)
     }
   };
 
@@ -160,7 +165,6 @@ function Home() {
         .currentState()
         .call();
       setState(currentState);
-      console.log({currentState});
 
       if (currentState == 2) {
         setDisplayCost(CONFIG.DISPLAY_COST_OG);
@@ -184,6 +188,79 @@ function Home() {
     }
   };
 
+  const getDataWithAlchemy = async () => {
+    const web3 = createAlchemyWeb3("https://eth-rinkeby.alchemyapi.io/v2/pBY3syVarS-tO2ZAQlA3uWBq_OqzwIDw");
+    const abiResponse = await fetch("/config/abi.json", {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    const abi = await abiResponse.json();
+    var contract = new Contract(abi, '0xBD511eb72780FbcD03417980f7979b1AaA206f97');
+    contract.setProvider(web3.currentProvider);
+    console.log(contract);
+    // Get Total Supply
+    const totalSupply = await contract.methods
+      .totalSupply()
+      .call();
+    setTotalSupply(totalSupply);
+
+    // Get Contract State
+    let currentState = await contract.methods
+      .currentState()
+      .call();
+    setState(currentState);
+
+    // Set Price and Max According to State
+
+    if (currentState == 0) {
+      setFeedback("Mint is not Live Yet!!!");
+      setDisable(true);
+      setDisplayCost(0.00);
+      setMax(0);
+    }
+    else if (currentState == 1) {
+      let wlCost = await contract.methods
+        .constWL()
+        .call();
+      setDisplayCost(web3.utils.fromWei(wlCost));
+
+      let wlMax = await contract.methods
+        .maxMintAmountWL()
+        .call();
+      setMax(wlMax);
+    }
+    else if (currentState == 2) {
+      let ogCost = await contract.methods
+        .constOG()
+        .call();
+      setDisplayCost(web3.utils.fromWei(ogCost));
+
+      let ogMax = await contract.methods
+        .maxMintAmountOG()
+        .call();
+      setMax(ogMax);
+    }
+    else {
+      let puCost = await contract.methods
+        .cost()
+        .call();
+      setDisplayCost(web3.utils.fromWei(puCost));
+
+      let puMax = await contract.methods
+        .maxMintAmountPublic()
+        .call();
+      setMax(puMax);
+    }
+
+
+
+
+
+
+  }
+
   const getConfig = async () => {
     const configResponse = await fetch("/config/config.json", {
       headers: {
@@ -197,6 +274,7 @@ function Home() {
 
   useEffect(() => {
     getConfig();
+    getDataWithAlchemy();
   }, []);
 
   useEffect(() => {
@@ -205,154 +283,154 @@ function Home() {
 
   return (
     <>
-        <s.Image src={"config/images/clouds_blue.svg"} style={{
-          transform: "rotate(180deg)"
-        }}/>
-        <s.FlexContainer jc={"center"} ai={"center"} fd={"row"} 
+      <s.Image src={"config/images/clouds_blue.svg"} style={{
+        transform: "rotate(180deg)"
+      }} />
+      <s.FlexContainer jc={"center"} ai={"center"} fd={"row"}
         style={{
           background: "#3491F9"
         }}>
-          <s.Mint>
-            <s.TextTitle
-              size={6.0}
-              style={{
-                letterSpacing: "3px",
-              
-              }}
-            >
-              MINT NOW
-            </s.TextTitle>
-            <s.SpacerSmall />
-            <s.TextSubTitle size={1.4}>
-              {CONFIG.MAX_SUPPLY - supply} of {CONFIG.MAX_SUPPLY} NFT's Available
-            </s.TextSubTitle>
-            <s.SpacerLarge />
-            <s.SpacerLarge />
+        <s.Mint>
+          <s.TextTitle
+            size={6.0}
+            style={{
+              letterSpacing: "3px",
 
-            <s.FlexContainer fd={"row"} ai={"center"} jc={"space-between"}>
-              <s.TextTitle>Amount</s.TextTitle>
+            }}
+          >
+            MINT NOW
+          </s.TextTitle>
+          <s.SpacerSmall />
+          <s.TextSubTitle size={1.4}>
+            {CONFIG.MAX_SUPPLY - supply} of {CONFIG.MAX_SUPPLY} NFT's Available
+          </s.TextSubTitle>
+          <s.SpacerLarge />
+          <s.SpacerLarge />
 
-              <s.AmountContainer ai={"center"} jc={"center"} fd={"row"}>
-                <StyledRoundButton
-                  style={{ lineHeight: 0.4 }}
-                  disabled={claimingNft ? 1 : 0}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    decrementMintAmount();
-                  }}
-                >
-                  -
-                </StyledRoundButton>
-                <s.SpacerMedium />
-                <s.TextDescription color={"var(--primary)"} size={"2.5rem"}>
-                  {mintAmount}
-                </s.TextDescription>
-                <s.SpacerMedium />
-                <StyledRoundButton
-                  disabled={claimingNft ? 1 : 0}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    incrementMintAmount();
-                  }}
-                >
-                  +
-                </StyledRoundButton>
-              </s.AmountContainer>
+          <s.FlexContainer fd={"row"} ai={"center"} jc={"space-between"}>
+            <s.TextTitle>Amount</s.TextTitle>
 
-              <s.maxButton
-                style={{ cursor: "pointer" }}
+            <s.AmountContainer ai={"center"} jc={"center"} fd={"row"}>
+              <StyledRoundButton
+                style={{ lineHeight: 0.4 }}
+                disabled={claimingNft ? 1 : 0}
                 onClick={(e) => {
                   e.preventDefault();
-                  maxNfts();
+                  decrementMintAmount();
                 }}
               >
-                Max
-              </s.maxButton>
-            </s.FlexContainer>
+                -
+              </StyledRoundButton>
+              <s.SpacerMedium />
+              <s.TextDescription color={"var(--primary)"} size={"2.5rem"}>
+                {mintAmount}
+              </s.TextDescription>
+              <s.SpacerMedium />
+              <StyledRoundButton
+                disabled={claimingNft ? 1 : 0}
+                onClick={(e) => {
+                  e.preventDefault();
+                  incrementMintAmount();
+                }}
+              >
+                +
+              </StyledRoundButton>
+            </s.AmountContainer>
 
-            <s.SpacerSmall />
-            <s.Line />
-            <s.SpacerLarge />
-            <s.FlexContainer fd={"row"} ai={"center"} jc={"space-between"}>
-              <s.TextTitle>Total</s.TextTitle>
-              <s.TextTitle color={"var(--primary)"}>{displayCost}</s.TextTitle>
-            </s.FlexContainer>
-            <s.SpacerSmall />
-            <s.Line />
-            <s.SpacerSmall />
-            <s.SpacerLarge />
-            {blockchain.account !== "" &&
+            <s.maxButton
+              style={{ cursor: "pointer" }}
+              onClick={(e) => {
+                e.preventDefault();
+                maxNfts();
+              }}
+            >
+              Max
+            </s.maxButton>
+          </s.FlexContainer>
+
+          <s.SpacerSmall />
+          <s.Line />
+          <s.SpacerLarge />
+          <s.FlexContainer fd={"row"} ai={"center"} jc={"space-between"}>
+            <s.TextTitle>Total</s.TextTitle>
+            <s.TextTitle color={"var(--primary)"}>{displayCost}</s.TextTitle>
+          </s.FlexContainer>
+          <s.SpacerSmall />
+          <s.Line />
+          <s.SpacerSmall />
+          <s.SpacerLarge />
+          {blockchain.account !== "" &&
             blockchain.smartContract !== null &&
             blockchain.errorMsg === "" ? (
-              <s.Container ai={"center"} jc={"center"} fd={"row"}>
-                <s.connectButton
-                  disabled={disable}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    claimNFTs();
-                    getData();
-                  }}
-                >
-                  {" "}
-                  {claimingNft ? "Confirm Transaction in Wallet" : "Mint"}{" "}
-                  {mintDone ? feedback : ""}{" "}
-                </s.connectButton>{" "}
-              </s.Container>
-            ) : (
-              <>
-                {/* {blockchain.errorMsg === "" ? ( */}
-                <s.connectButton
-                  style={{
-                    textAlign: "center",
-                    color: "#fff",
-                    cursor: "pointer",
-                  }}
-                  disabled={state == 0 ? 1 : 0}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    dispatch(connectWallet());
-                    getData();
-                  }}
-                >
-                  Connect to Wallet
-                </s.connectButton>
-                {/* ) : ("")} */}
-              </>
-            )}
-            <s.SpacerLarge />
-            {blockchain.errorMsg !== "" ? (
+            <s.Container ai={"center"} jc={"center"} fd={"row"}>
+              <s.connectButton
+                disabled={disable}
+                onClick={(e) => {
+                  e.preventDefault();
+                  claimNFTs();
+                  getData();
+                }}
+              >
+                {" "}
+                {claimingNft ? "Confirm Transaction in Wallet" : "Mint"}{" "}
+                {mintDone ? feedback : ""}{" "}
+              </s.connectButton>{" "}
+            </s.Container>
+          ) : (
+            <>
+              {/* {blockchain.errorMsg === "" ? ( */}
               <s.connectButton
                 style={{
                   textAlign: "center",
                   color: "#fff",
                   cursor: "pointer",
                 }}
+                disabled={state == 0 ? 1 : 0}
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(connectWallet());
+                  getData();
+                }}
               >
-                {blockchain.errorMsg}
+                Connect to Wallet
               </s.connectButton>
-            ) : (
-              ""
-            )}
+              {/* ) : ("")} */}
+            </>
+          )}
+          <s.SpacerLarge />
+          {blockchain.errorMsg !== "" ? (
+            <s.connectButton
+              style={{
+                textAlign: "center",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              {blockchain.errorMsg}
+            </s.connectButton>
+          ) : (
+            ""
+          )}
 
-            {canMintOG !== true &&
+          {canMintOG !== true &&
             canMintWL !== true &&
             (state == 2 || state == 1) ? (
-              <s.connectButton
-                style={{
-                  textAlign: "center",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
-              >
-                {feedback}
-              </s.connectButton>
-            ) : (
-              ""
-            )}
-          </s.Mint>
-        </s.FlexContainer>
-        <s.Image src={"config/images/clouds_blue.svg"}/>
-     
+            <s.connectButton
+              style={{
+                textAlign: "center",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              {feedback}
+            </s.connectButton>
+          ) : (
+            ""
+          )}
+        </s.Mint>
+      </s.FlexContainer>
+      <s.Image src={"config/images/clouds_blue.svg"} />
+
     </>
   );
 }
