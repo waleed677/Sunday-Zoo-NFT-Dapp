@@ -1,12 +1,12 @@
 {
-  "CONTRACT_ADDRESS": "0x4099271220ee1E6c039580Aa9D554793afFb1dB2",
-  "SCAN_LINK": "https://etherscan.io/address/0x23132196a8ea986C0bC63e35835FaE563ed42588",
+  "CONTRACT_ADDRESS": "0x938476ceeff2b2999c96455fc22ae5aa1951efdb",
+  "SCAN_LINK": "https://etherscan.io/address/0x938476ceeff2b2999c96455fc22ae5aa1951efdb",
   "NETWORK": {
     "NAME": "Ethereum",
     "SYMBOL": "ETH",
-    "ID": 4
+    "ID": 1
   },
-  "NETWORK_ID_WALLET": 4,
+  "NETWORK_ID_WALLET": 1,
   "NFT_NAME": "Sunday Zoo NFT",
   "SYMBOL": "SZ",
   "MAX_SUPPLY": 888 ,

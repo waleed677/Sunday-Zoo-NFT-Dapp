@@ -147,7 +147,7 @@ function Home() {
   };
 
   const getDataWithAlchemy = async () => {
-    const web3 = createAlchemyWeb3("https://eth-rinkeby.alchemyapi.io/v2/pBY3syVarS-tO2ZAQlA3uWBq_OqzwIDw");
+    const web3 = createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/pBY3syVarS-tO2ZAQlA3uWBq_OqzwIDw");
     const abiResponse = await fetch("/config/abi.json", {
       headers: {
         "Content-Type": "application/json",
@@ -155,7 +155,7 @@ function Home() {
       },
     });
     const abi = await abiResponse.json();
-    var contract = new Contract(abi, '0x4099271220ee1E6c039580Aa9D554793afFb1dB2');
+    var contract = new Contract(abi, '0x938476ceeff2b2999c96455fc22ae5aa1951efdb');
     contract.setProvider(web3.currentProvider);
     console.log(contract);
     // Get Total Supply
