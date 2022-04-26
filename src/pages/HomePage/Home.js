@@ -245,16 +245,14 @@ function Home() {
 
   return (
     <>
-      <s.Image src={"config/images/clouds_blue.svg"} style={{
+      {/* <s.Image src={"config/images/clouds_blue.svg"} style={{
         transform: "rotate(180deg)"
-      }} />
+      }} /> */}
       <s.FlexContainer jc={"center"} ai={"center"} fd={"row"}
-        style={{
-          background: "#3491F9"
-        }}>
+       >
         <s.Mint>
           <s.TextTitle
-            size={6.0}
+            size={5.0}
             style={{
               letterSpacing: "3px",
 
@@ -391,7 +389,7 @@ function Home() {
           )}
         </s.Mint>
       </s.FlexContainer>
-      <s.Image src={"config/images/clouds_blue.svg"} />
+      {/* <s.Image src={"config/images/clouds_blue.svg"} /> */}
 
     </>
   );
