@@ -80,7 +80,7 @@ function Home() {
       })
       .then((receipt) => {
         setMintDone(true);
-        setFeedback(`Done, the ${CONFIG.NFT_NAME} is yours!`);
+        setFeedback(`Congratulation, Your mint is successful.`);
         setClaimingNft(false);
         blockchain.smartContract.methods
           .totalSupply()
