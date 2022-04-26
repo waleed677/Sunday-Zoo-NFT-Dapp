@@ -4,10 +4,20 @@ import { connectWallet } from "../../redux/blockchain/blockchainActions";
 import { fetchData } from "./../../redux/data/dataActions";
 import { StyledRoundButton } from "./../../components/styles/styledRoundButton.styled";
 import * as s from "./../../styles/globalStyles";
+import whitelistAddresses from "../walletAddresses";
 
 const { createAlchemyWeb3, ethers } = require("@alch/alchemy-web3");
 var Web3 = require('web3');
 var Contract = require('web3-eth-contract');
+const { MerkleTree } = require('merkletreejs');
+const keccak256 = require('keccak256');
+
+const leafNodes = whitelistAddresses.map(addr => keccak256(addr));
+const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true });
+const rootHash = merkleTree.getRoot();
+console.log('Whitelist Merkle Tree\n', merkleTree.toString());
+
+
 function Home() {
 
   const dispatch = useDispatch();
@@ -25,6 +35,7 @@ function Home() {
   const [canMintOG, setCanMintOG] = useState(false);
   const [disable, setDisable] = useState(false);
   const [max, setMax] = useState(0);
+  const [proof,setProof] = useState([]);
   const [CONFIG, SET_CONFIG] = useState({
     CONTRACT_ADDRESS: "",
     SCAN_LINK: "",
@@ -55,7 +66,7 @@ function Home() {
     setClaimingNft(true);
     setDisable(true);
     blockchain.smartContract.methods
-      .mint(mintAmount)
+      .mint(mintAmount,proof)
       .send({
         gasLimit: String(totalGasLimit),
         to: CONFIG.CONTRACT_ADDRESS,
@@ -134,10 +145,13 @@ function Home() {
         mintOG ? "" : setFeedback(`You are not OGed Member!!!`);
         mintOG ? setDisable(false) : setDisable(true);
       } else if (currentState == 1) {
-        let mintWL = await blockchain.smartContract.methods
-          .isWhitelisted(blockchain.account)
-          .call();
-        setCanMintWL(mintWL);
+        const claimingAddress = keccak256(blockchain.account);
+        // `getHexProof` returns the neighbour leaf and all parent nodes hashes that will
+        // be required to derive the Merkle Trees root hash.
+        const hexProof = merkleTree.getHexProof(claimingAddress);
+        setProof(hexProof);
+        let mintWL = merkleTree.verify(hexProof, claimingAddress, rootHash);
+          setCanMintWL(mintWL);
         mintWL ? "" : setFeedback(`You are not WhiteListed Member!!!`);
         mintWL ? setDisable(false) : setDisable(true);
       } else {
