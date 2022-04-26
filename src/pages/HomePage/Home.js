@@ -147,7 +147,7 @@ function Home() {
   };
 
   const getDataWithAlchemy = async () => {
-    const web3 = createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/pBY3syVarS-tO2ZAQlA3uWBq_OqzwIDw");
+    const web3 = createAlchemyWeb3("https://eth-rinkeby.alchemyapi.io/v2/pBY3syVarS-tO2ZAQlA3uWBq_OqzwIDw");
     const abiResponse = await fetch("/config/abi.json", {
       headers: {
         "Content-Type": "application/json",
