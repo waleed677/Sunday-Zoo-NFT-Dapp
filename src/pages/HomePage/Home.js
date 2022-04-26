@@ -64,7 +64,7 @@ function Home() {
     let totalGasLimit = String(gasLimit * mintAmount);
     setFeedback(`Minting your ${CONFIG.NFT_NAME}`);
     setClaimingNft(true);
-    setDisable(true);
+    // setDisable(true);
     blockchain.smartContract.methods
       .mint(mintAmount,proof)
       .send({
