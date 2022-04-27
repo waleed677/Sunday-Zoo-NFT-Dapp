@@ -380,7 +380,7 @@ function Home() {
                   getData();
                 }}
               >
-                Connect to Wallet
+                Connect Wallet
               </s.connectButton>
               {/* ) : ("")} */}
             </>
