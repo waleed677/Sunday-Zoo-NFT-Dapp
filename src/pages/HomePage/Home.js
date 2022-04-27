@@ -153,7 +153,7 @@ function Home() {
         let mintWL = merkleTree.verify(hexProof, claimingAddress, rootHash);
           setCanMintWL(mintWL);
           console.log(mintWL);
-        mintWL ? setFeedback(`You are WhiteListed Member!!!`) : setFeedback(`You are not WhiteListed Member!!!`);
+        mintWL ? setFeedback(`You are WhiteListed Member!!!`) : setFeedback(`Sorry, your wallet is not on the whitelist`);
         mintWL ? setDisable(false) : setDisable(true);
       } else {
         
