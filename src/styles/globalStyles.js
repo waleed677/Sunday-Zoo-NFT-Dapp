@@ -126,7 +126,7 @@ export const Mint = styled.div`
   border-radius: 25px;
   width: 30%;
   margin-top: 25vh;
-  background: rgba(55, 110, 255, 0.9);
+  background: rgb(52,145,249);
   // box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
   @media screen and (max-width: 1024px) {
@@ -141,8 +141,8 @@ export const Mint = styled.div`
 
   @media screen and (max-width: 480px) {
     width: 95%;
-    margin-top: 10vh;
-    padding: 20px 40px;
+    margin-top: 5vh;
+    padding: 20px 20px;
   }
 `;
 

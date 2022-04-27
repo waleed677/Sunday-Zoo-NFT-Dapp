@@ -1,12 +1,12 @@
 {
-  "CONTRACT_ADDRESS": "0xA543653d8b02146a29bF9b1902382C2c233AF637",
+  "CONTRACT_ADDRESS": "0x2f675e42f735e13aa3d0231d32db43e54cffa565",
   "SCAN_LINK": "https://etherscan.io/address/0xA543653d8b02146a29bF9b1902382C2c233AF637",
   "NETWORK": {
-    "NAME": "Ethereum",
+    "NAME": "Ethereum Kovan",
     "SYMBOL": "ETH",
-    "ID": 4
+    "ID": 42
   },
-  "NETWORK_ID_WALLET": 4,
+  "NETWORK_ID_WALLET": 42,
   "NFT_NAME": "Sunday Zoo NFT",
   "SYMBOL": "SZ",
   "MAX_SUPPLY": 888 ,

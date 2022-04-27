@@ -152,7 +152,8 @@ function Home() {
         setProof(hexProof);
         let mintWL = merkleTree.verify(hexProof, claimingAddress, rootHash);
           setCanMintWL(mintWL);
-        mintWL ? "" : setFeedback(`You are not WhiteListed Member!!!`);
+          console.log(mintWL);
+        mintWL ? setFeedback(`You are WhiteListed Member!!!`) : setFeedback(`You are not WhiteListed Member!!!`);
         mintWL ? setDisable(false) : setDisable(true);
       } else {
         
@@ -161,7 +162,7 @@ function Home() {
   };
 
   const getDataWithAlchemy = async () => {
-    const web3 = createAlchemyWeb3("https://eth-rinkeby.alchemyapi.io/v2/pBY3syVarS-tO2ZAQlA3uWBq_OqzwIDw");
+    const web3 = createAlchemyWeb3("https://eth-kovan.alchemyapi.io/v2/pBY3syVarS-tO2ZAQlA3uWBq_OqzwIDw");
     const abiResponse = await fetch("/config/abi.json", {
       headers: {
         "Content-Type": "application/json",
@@ -169,9 +170,8 @@ function Home() {
       },
     });
     const abi = await abiResponse.json();
-    var contract = new Contract(abi, '0xA543653d8b02146a29bF9b1902382C2c233AF637');
+    var contract = new Contract(abi, '0x2f675e42f735e13aa3d0231d32db43e54cffa565');
     contract.setProvider(web3.currentProvider);
-    console.log(contract);
     // Get Total Supply
     const totalSupply = await contract.methods
       .totalSupply()
@@ -183,6 +183,7 @@ function Home() {
       .currentState()
       .call();
     setState(currentState);
+    console.log(currentState);
 
     // Set Price and Max According to State
 
@@ -230,11 +231,6 @@ function Home() {
       setMax(puMax);
     }
 
-
-
-
-
-
   }
 
   const getConfig = async () => {
@@ -259,9 +255,6 @@ function Home() {
 
   return (
     <>
-      {/* <s.Image src={"config/images/clouds_blue.svg"} style={{
-        transform: "rotate(180deg)"
-      }} /> */}
       <s.FlexContainer jc={"center"} ai={"center"} fd={"row"}
        >
         <s.Mint>
@@ -345,9 +338,9 @@ function Home() {
                   getData();
                 }}
               >
-                {" "}
-                {claimingNft ? "Confirm Transaction in Wallet" : "Mint"}{" "}
-                {mintDone ? feedback : ""}{" "}
+               
+                {claimingNft? "Confirm Transaction in Wallet" : "Mint"}
+                {/* {mintDone && !claimingNft  ? feedback : ""} */}
               </s.connectButton>{" "}
             </s.Container>
           ) : (
@@ -383,10 +376,18 @@ function Home() {
               {blockchain.errorMsg}
             </s.connectButton>
           ) : (
-            ""
+            <s.TextDescription
+              style={{
+                textAlign: "center",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              {feedback}
+            </s.TextDescription>
           )}
 
-          {canMintOG !== true &&
+          {/* {canMintOG !== true &&
             canMintWL !== true &&
             (state == 2 || state == 1) ? (
             <s.connectButton
@@ -400,10 +401,10 @@ function Home() {
             </s.connectButton>
           ) : (
             ""
-          )}
+          )} */}
         </s.Mint>
       </s.FlexContainer>
-      {/* <s.Image src={"config/images/clouds_blue.svg"} /> */}
+    
 
     </>
   );
