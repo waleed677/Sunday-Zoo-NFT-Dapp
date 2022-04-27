@@ -220,7 +220,7 @@ function Home() {
         .call();
       setDisplayCost(web3.utils.fromWei(wlCost));
       setNftCost(web3.utils.fromWei(wlCost));
-      setFeedback("Are you WhiteListed Member?");
+      setFeedback("Are you Whitelisted Member?");
 
       let wlMax = await contract.methods
         .maxMintAmountWL()
@@ -290,7 +290,7 @@ function Home() {
           </s.TextTitle>
           <s.SpacerSmall />
           <s.TextSubTitle size={1.4}>
-            {CONFIG.MAX_SUPPLY - supply} of {CONFIG.MAX_SUPPLY} NFT's Available
+            {CONFIG.MAX_SUPPLY - supply} of {CONFIG.MAX_SUPPLY} NFTs Available
           </s.TextSubTitle>
           <s.SpacerLarge />
           <s.SpacerLarge />
