@@ -146,7 +146,7 @@ export const Mint = styled.div`
 
   @media screen and (max-width: 480px) {
     width: 95%;
-    margin-top:-5vh;
+    margin-top:0vh;
     padding: 20px 20px;
   }
 `;
