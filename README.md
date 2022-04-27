@@ -1,4 +1,4 @@
-# Sunday Zoo NFT's Mint Page
+# BeLeeWorld Minting NFT's Mint Page
 
 
 ## Website Link
