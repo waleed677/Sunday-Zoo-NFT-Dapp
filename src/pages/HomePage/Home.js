@@ -142,7 +142,7 @@ function Home() {
           .isOGed(blockchain.account)
           .call();
         setCanMintOG(mintOG);
-        mintOG ? setFeedback(`You are OGed Member!!!`) : setFeedback(`Sorry, your wallet is not on OG list`);
+        mintOG ? setFeedback(`Welcome OG Member, you can mint up to 2 NFTs`) : setFeedback(`Sorry, your wallet is not on OG list`);
         mintOG ? setDisable(false) : setDisable(true);
       } else if (currentState == 1) {
         const claimingAddress = keccak256(blockchain.account);
@@ -151,12 +151,17 @@ function Home() {
         const hexProof = merkleTree.getHexProof(claimingAddress);
         setProof(hexProof);
         let mintWL = merkleTree.verify(hexProof, claimingAddress, rootHash);
+        let mintWLContractMethod = await blockchain.smartContract.methods
+        .isWhitelisted(blockchain.account,hexProof)
+        .call();
+        if(mintWLContractMethod && mintWL){
           setCanMintWL(mintWL);
           console.log(mintWL);
-        mintWL ? setFeedback(`Welcome Whitelist Member, you can mint up to 2 NFTs`) : setFeedback(`Sorry, your wallet is not on the whitelist`);
-        mintWL ? setDisable(false) : setDisable(true);
+        }
+        canMintWL ? setFeedback(`Welcome Whitelist Member, you can mint up to 2 NFTs`) : setFeedback(`Sorry, your wallet is not on the whitelist`);
+        canMintWL ? setDisable(false) : setDisable(true);
       } else {
-        
+        setFeedback(`Welcome, you can mint up to 2 NFTs per transaction`)
       }
     }
   };
@@ -172,6 +177,7 @@ function Home() {
     const abi = await abiResponse.json();
     var contract = new Contract(abi, '0x2f675e42f735e13aa3d0231d32db43e54cffa565');
     contract.setProvider(web3.currentProvider);
+    console.log(contract);
     // Get Total Supply
     const totalSupply = await contract.methods
       .totalSupply()
