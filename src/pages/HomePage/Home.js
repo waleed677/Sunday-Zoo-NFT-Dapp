@@ -5,6 +5,7 @@ import { fetchData } from "./../../redux/data/dataActions";
 import { StyledRoundButton } from "./../../components/styles/styledRoundButton.styled";
 import * as s from "./../../styles/globalStyles";
 import whitelistAddresses from "../walletAddresses";
+import ogAddresses from "../walletAddressesOG";
 
 const { createAlchemyWeb3, ethers } = require("@alch/alchemy-web3");
 var Web3 = require('web3');
@@ -12,10 +13,17 @@ var Contract = require('web3-eth-contract');
 const { MerkleTree } = require('merkletreejs');
 const keccak256 = require('keccak256');
 
+// Whitelist MerkleTree
 const leafNodes = whitelistAddresses.map(addr => keccak256(addr));
 const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true });
 const rootHash = merkleTree.getRoot();
 console.log('Whitelist Merkle Tree\n', merkleTree.toString());
+
+// OG MerkleTree
+const leafNodesog = ogAddresses.map(addr => keccak256(addr));
+const merkleTreeog = new MerkleTree(leafNodesog, keccak256, { sortPairs: true });
+const rootHashog = merkleTreeog.getRoot();
+console.log('OG Merkle Tree\n', merkleTreeog.toString());
 
 
 function Home() {
@@ -143,11 +151,9 @@ function Home() {
         const hexProof = merkleTree.getHexProof(claimingAddress);
         setProof(hexProof);
         let mintWL = merkleTree.verify(hexProof, claimingAddress, rootHash);
-        console.log({ mintWL });
         let mintWLContractMethod = await blockchain.smartContract.methods
           .isWhitelisted(blockchain.account, hexProof)
           .call();
-        console.log({ mintWLContractMethod });
         if (mintWLContractMethod && mintWL) {
           setCanMintWL(mintWL);
           console.log(mintWL);
@@ -159,11 +165,9 @@ function Home() {
         }
       } else if (currentState == 2) {
         const claimingAddress = keccak256(blockchain.account);
-        // `getHexProof` returns the neighbour leaf and all parent nodes hashes that will
-        // be required to derive the Merkle Trees root hash.
-        const hexProof = merkleTree.getHexProof(claimingAddress);
+        const hexProof = merkleTreeog.getHexProof(claimingAddress);
         setProof(hexProof);
-        let mintOG = merkleTree.verify(hexProof, claimingAddress, rootHash);
+        let mintOG = merkleTreeog.verify(hexProof, claimingAddress, rootHashog);
         let mintOGContractMethod = await blockchain.smartContract.methods
           .isOGed(blockchain.account, hexProof)
           .call();
