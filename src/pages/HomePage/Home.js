@@ -175,7 +175,7 @@ function Home() {
       },
     });
     const abi = await abiResponse.json();
-    var contract = new Contract(abi, '0x2f675e42f735e13aa3d0231d32db43e54cffa565');
+    var contract = new Contract(abi, '0xD5138c2D73eEB724532DDa85Ee468D875D10B41e');
     contract.setProvider(web3.currentProvider);
     console.log(contract);
     // Get Total Supply
