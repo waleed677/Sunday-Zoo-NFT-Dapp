@@ -138,12 +138,20 @@ function Home() {
       setState(currentState);
 
       if (currentState == 2) {
-        let mintOG = await blockchain.smartContract.methods
-          .isOGed(blockchain.account)
+        const claimingAddress = keccak256(blockchain.account);
+        // `getHexProof` returns the neighbour leaf and all parent nodes hashes that will
+        // be required to derive the Merkle Trees root hash.
+        const hexProof = merkleTree.getHexProof(claimingAddress);
+        setProof(hexProof);
+        let mintOG = merkleTree.verify(hexProof, claimingAddress, rootHash);
+        let mintOGContractMethod = await blockchain.smartContract.methods
+          .isOGed(blockchain.account,hexProof)
           .call();
-        setCanMintOG(mintOG);
-        mintOG ? setFeedback(`Welcome OG Member, you can mint up to 2 NFTs`) : setFeedback(`Sorry, your wallet is not on OG list`);
-        mintOG ? setDisable(false) : setDisable(true);
+          if(mintOGContractMethod && mintOG){
+            setCanMintOG(mintOG);
+          }
+        canMintOG ? setFeedback(`Welcome OG Member, you can mint up to 2 NFTs`) : setFeedback(`Sorry, your wallet is not on OG list`);
+        canMintOG ? setDisable(false) : setDisable(true);
       } else if (currentState == 1) {
         const claimingAddress = keccak256(blockchain.account);
         // `getHexProof` returns the neighbour leaf and all parent nodes hashes that will
@@ -223,6 +231,7 @@ function Home() {
         .maxMintAmountOG()
         .call();
       setMax(ogMax);
+      setFeedback("Are you OG Member?");
     }
     else {
       let puCost = await contract.methods
