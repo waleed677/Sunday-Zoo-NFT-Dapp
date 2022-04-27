@@ -176,7 +176,7 @@ function Home() {
           setDisable(true);
         }
       } else {
-        setFeedback(`Welcome, you can mint up to 2 NFTs per transaction`)
+        setFeedback(`Welcome, you can mint up to 4 NFTs per transaction`)
       }
     }
   };
@@ -280,7 +280,7 @@ function Home() {
       >
         <s.Mint>
           <s.TextTitle
-            size={5.0}
+            size={4.0}
             style={{
               letterSpacing: "3px",
 
