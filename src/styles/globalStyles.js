@@ -131,7 +131,7 @@ export const Mint = styled.div`
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
   // background: rgb(52,145,249);
-  background:  rgba(55, 110, 255, 0.9);;
+  background: rgb(39,71,120);
   // box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
   @media screen and (max-width: 1024px) {
@@ -146,7 +146,7 @@ export const Mint = styled.div`
 
   @media screen and (max-width: 480px) {
     width: 95%;
-    margin-top: 5vh;
+    margin-top: -10vh;
     padding: 20px 20px;
   }
 `;
