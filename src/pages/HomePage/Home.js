@@ -142,7 +142,7 @@ function Home() {
           .isOGed(blockchain.account)
           .call();
         setCanMintOG(mintOG);
-        mintOG ? "" : setFeedback(`You are not OGed Member!!!`);
+        mintOG ? setFeedback(`You are OGed Member!!!`) : setFeedback(`Sorry, your wallet is not on OG list`);
         mintOG ? setDisable(false) : setDisable(true);
       } else if (currentState == 1) {
         const claimingAddress = keccak256(blockchain.account);
