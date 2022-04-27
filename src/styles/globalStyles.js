@@ -125,7 +125,11 @@ export const Mint = styled.div`
   padding: 10px 40px;
   border-radius: 25px;
   width: 30%;
-  margin-top: 25vh;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
   background: rgb(52,145,249);
   // box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
